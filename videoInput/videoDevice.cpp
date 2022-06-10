@@ -14,8 +14,10 @@
 #include "ImageGrabber.h"
 #include "RawImage.h"
 
+#include <atlbase.h>
 
 #pragma comment(lib, "Strmiids")
+
 videoDevice::videoDevice(void): vd_IsSetuped(false), vd_LockOut(OpenLock), vd_pFriendlyName(NULL),
 	vd_Width(0), vd_Height(0), vd_pSource(NULL), vd_func(NULL), vd_userData(NULL)
 {	
@@ -187,6 +189,75 @@ long videoDevice::resetDevice(IMFActivate *pActivate)
 	return hr;
 }
 
+// https://chromium.googlesource.com/chromium/src/+/89078d2ab6972dc47bc6a3f4f5ad7ac65fd28cb3/media/capture/video/win/video_capture_device_factory_win.cc
+
+long videoDevice::resetDevice(BSTR friendlyName, BSTR devicePath)
+{
+    HRESULT hr = -1;
+
+    vd_CurrentFormats.clear();
+
+    if (vd_pFriendlyName)
+        CoTaskMemFree(vd_pFriendlyName);
+
+    {
+        const auto size = (lstrlenW(friendlyName) + 1) * 2;
+        vd_pFriendlyName = (wchar_t*)CoTaskMemAlloc(size);
+        memcpy(vd_pFriendlyName, friendlyName, size);
+    }
+
+    CComPtr<IMFMediaSource> pSource;
+
+    CComPtr<IMFAttributes> attributes;
+
+    /*
+    hr = pActivate->GetAllocatedString(
+        MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,
+        &vd_pFriendlyName,
+        NULL
+    );
+
+
+    hr = pActivate->ActivateObject(
+        __uuidof(IMFMediaSource),
+        (void**)&pSource
+    );
+    */
+
+    MFCreateAttributes(&attributes, 2);
+
+    attributes->SetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
+        MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
+
+    attributes->SetString(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, devicePath);
+    //attributes->SetString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, devicePath);
+
+    hr = MFCreateDeviceSource(attributes, &pSource);
+
+    if (SUCCEEDED(hr))
+    {
+        enumerateCaptureFormats(pSource);
+
+        buildLibraryofTypes();
+
+    }
+
+    //SafeRelease(&pSource);
+
+
+
+    if (FAILED(hr))
+    {
+        vd_pFriendlyName = NULL;
+
+        DebugPrintOut *DPO = &DebugPrintOut::getInstance();
+
+        DPO->printOut(L"VIDEODEVICE %i: IMFMediaSource interface cannot be created \n", vd_CurrentNumber);
+    }
+
+    return hr;
+}
+
 long videoDevice::readInfoOfDevice(IMFActivate *pActivate, unsigned int Num)
 {
 	HRESULT hr = -1;
@@ -196,6 +267,17 @@ long videoDevice::readInfoOfDevice(IMFActivate *pActivate, unsigned int Num)
 	hr = resetDevice(pActivate);
 
 	return hr;
+}
+
+long videoDevice::readInfoOfDevice(BSTR friendlyName, BSTR devicePath, unsigned int Num)
+{
+    HRESULT hr = -1;
+
+    vd_CurrentNumber = Num;
+
+    hr = resetDevice(friendlyName, devicePath);
+
+    return hr;
 }
 
 long videoDevice::checkDevice(IMFAttributes *pAttributes, IMFActivate **pDevice)

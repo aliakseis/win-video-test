@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 
+#include <WTypes.h>
 
 #include "videoInput.h"
 
@@ -45,7 +46,8 @@ public:
 	void setEmergencyStopEvent(void *userData, void(*func)(int, void *));
 	
 	long readInfoOfDevice(IMFActivate *pActivate, unsigned int Num);
-		
+    long readInfoOfDevice(BSTR friendlyName, BSTR devicePath, unsigned int Num);
+
 	wchar_t *getName();
 
 	int getCountFormats();
@@ -117,7 +119,8 @@ private:
 	int findType(unsigned int size, unsigned int frameRate = 0);	
 	
 	long resetDevice(IMFActivate *pActivate);
-	
+    long resetDevice(BSTR friendlyName, BSTR devicePath);
+
 	long initDevice();
 
 	long checkDevice(IMFAttributes *pAttributes, IMFActivate **pDevice);

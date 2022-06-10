@@ -8,6 +8,29 @@
 #include "DebugPrintOut.h"
 #include "Common.h"
 
+#include <dshow.h>
+
+static HRESULT EnumerateDevices(REFGUID category, IEnumMoniker **ppEnum)
+{
+    // Create the System Device Enumerator.
+    ICreateDevEnum *pDevEnum;
+    HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum, nullptr,
+        CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pDevEnum));
+
+    if (SUCCEEDED(hr))
+    {
+        // Create an enumerator for the category.
+        hr = pDevEnum->CreateClassEnumerator(category, ppEnum, 0);
+        if (hr == S_FALSE)
+        {
+            hr = VFW_E_NOT_FOUND;  // The category is empty. Treat as an error.
+        }
+        pDevEnum->Release();
+    }
+    return hr;
+}
+
+
 Media_Foundation::Media_Foundation(void)
 {
 	HRESULT hr = MFStartup(MF_VERSION);
@@ -34,6 +57,7 @@ Media_Foundation::~Media_Foundation(void)
 
 bool Media_Foundation::buildListOfDevices()
 {	
+    /*
 	HRESULT hr = S_OK;
 	
 	IMFAttributes *pAttributes = NULL;
@@ -68,6 +92,24 @@ bool Media_Foundation::buildListOfDevices()
 	SafeReleaseAllCount(&pAttributes);
 
 	return (SUCCEEDED(hr));
+    */
+
+    CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
+    IEnumMoniker *pEnum;
+
+    HRESULT hr = EnumerateDevices(CLSID_VideoInputDeviceCategory, &pEnum);
+    if (SUCCEEDED(hr))
+    {
+        //DisplayDeviceInformation(pEnum);
+
+        hr = videoDevices::getInstance().initDevices(pEnum);
+
+        pEnum->Release();
+    }
+
+
+    return (SUCCEEDED(hr));
 }
 
 

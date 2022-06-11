@@ -14,7 +14,6 @@
     <ProjectGuid>{84F63AD1-BB5D-4DE0-A22D-E669D6F8EE88}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>videoInput</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

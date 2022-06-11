@@ -57,7 +57,7 @@ Media_Foundation::~Media_Foundation(void)
 
 bool Media_Foundation::buildListOfDevices()
 {	
-    /*
+    //*
 	HRESULT hr = S_OK;
 	
 	IMFAttributes *pAttributes = NULL;
@@ -92,8 +92,9 @@ bool Media_Foundation::buildListOfDevices()
 	SafeReleaseAllCount(&pAttributes);
 
 	return (SUCCEEDED(hr));
-    */
+    //*/
 
+    /*
     CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
     IEnumMoniker *pEnum;
@@ -108,8 +109,8 @@ bool Media_Foundation::buildListOfDevices()
         pEnum->Release();
     }
 
-
     return (SUCCEEDED(hr));
+    //*/
 }
 
 

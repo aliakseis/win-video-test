@@ -44,47 +44,48 @@ videoDevice * videoDevices::getDevice(unsigned int i)
 	return vds_Devices[i];
 }
 
-long videoDevices::initDevices(IEnumMoniker *pAttributes)
+long videoDevices::initDevices(IMFAttributes *pAttributes)
 {
-    /*
-	HRESULT hr = S_OK;
-		
-	IMFActivate **ppDevices = NULL;
+    HRESULT hr = S_OK;
 
-	clearDevices();
-	
-	hr = MFEnumDeviceSources(pAttributes, &ppDevices, &count);
+    IMFActivate **ppDevices = NULL;
 
-	if (SUCCEEDED(hr))
+    clearDevices();
+
+    hr = MFEnumDeviceSources(pAttributes, &ppDevices, &count);
+
+    if (SUCCEEDED(hr))
     {
         if(count > 0)
-		{
-			for(UINT32 i = 0; i < count; i++)
-			{
-				videoDevice *vd = new videoDevice;
+        {
+            for(UINT32 i = 0; i < count; i++)
+            {
+                videoDevice *vd = new videoDevice;
 
-				vd->readInfoOfDevice(ppDevices[i], i);
+                vd->readInfoOfDevice(ppDevices[i], i);
 
-				vds_Devices.push_back(vd);	
-				
-				SafeRelease(&ppDevices[i]);
-			}	
+                vds_Devices.push_back(vd);
 
-			SafeReleaseAllCount(ppDevices);
-		}
-		else
-			hr = -1;
+                SafeRelease(&ppDevices[i]);
+            }
+
+            SafeReleaseAllCount(ppDevices);
+        }
+        else
+            hr = -1;
     }
-	else
-	{
-		DebugPrintOut *DPO = &DebugPrintOut::getInstance();
+    else
+    {
+        DebugPrintOut *DPO = &DebugPrintOut::getInstance();
 
-		DPO->printOut(L"VIDEODEVICES: The instances of the videoDevice class cannot be created\n");
-	}
+        DPO->printOut(L"VIDEODEVICES: The instances of the videoDevice class cannot be created\n");
+    }
 
-	return hr;
-    */
+    return hr;
+}
 
+long videoDevices::initDevices(IEnumMoniker *pAttributes)
+{
     IMoniker *pMoniker = nullptr;
 
     int i = 0;

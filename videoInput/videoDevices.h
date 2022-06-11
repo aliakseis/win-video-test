@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 
+struct IMFAttributes;
 struct IEnumMoniker;
 
 class videoDevice;
@@ -15,6 +16,7 @@ class videoDevices
 public:
 	~videoDevices(void);
 
+    long initDevices(IMFAttributes *pAttributes);
 	long initDevices(IEnumMoniker *pAttributes);
 
 	static videoDevices& getInstance();

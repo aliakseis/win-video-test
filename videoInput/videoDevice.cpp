@@ -210,20 +210,6 @@ long videoDevice::resetDevice(BSTR friendlyName, BSTR devicePath)
 
     CComPtr<IMFAttributes> attributes;
 
-    /*
-    hr = pActivate->GetAllocatedString(
-        MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,
-        &vd_pFriendlyName,
-        NULL
-    );
-
-
-    hr = pActivate->ActivateObject(
-        __uuidof(IMFMediaSource),
-        (void**)&pSource
-    );
-    */
-
     MFCreateAttributes(&attributes, 2);
 
     attributes->SetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
